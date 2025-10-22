@@ -164,7 +164,7 @@ define([
       this.countCharacters();
       this.setReadyStatus();
 
-      if (this.model.get('_isComplete') && !this.model.get('_canShowModelAnswer')) {
+      if (this.model.get('_isComplete')) {
         // Model answer has been disabled.
         // Force setting the correct/submitted state.        
         this.model.set('_buttonState', BUTTON_STATE.CORRECT);
