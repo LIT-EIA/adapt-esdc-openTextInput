@@ -22,7 +22,8 @@ define([
       'focusin .openTextInput-item-textbox': 'onFocusInTextarea',
       'focusout .openTextInput-item-textbox': 'onFocusOutTextarea'
     },
-
+    submissionClicked: false,
+    $feedbackButton: null,
     formatPlaceholder: function() {
       // Replace quote marks in placholder.
       var placeholder = this.model.get('placeholder') || '';
@@ -130,8 +131,10 @@ define([
       this._runModelCompatibleFunction("setupFeedback");
       $(window).resize();
       this._runModelCompatibleFunction("updateButtons");
+      this.$feedbackButton = this.$el.find('.buttons-feedback');
       this.showFeedback();
       this.onSubmitted();
+      this.submissionClicked = true;
   },
 
     canSubmit: function() {
@@ -274,6 +277,7 @@ define([
 
     postRender: function() {
       // add aria-labelledby for textarea
+      let self = this;
       let olabel = this.model.get('_id') + '-OpenTextInput-InstructionID'
       this.$('.openTextInput-instruction-inner').attr('id', olabel);
       this.$('.openTextInput-answer-container textarea').attr('aria-labelledby', olabel);
@@ -282,14 +286,18 @@ define([
       
       if (this.$('.openTextInput-item-modelanswer').height() <= 0) {
         this.$('.openTextInput-item-textbox, .openTextInput-count-characters').css('height', 'auto');
-      } else {
-        // Set the height of the textarea to the height of the model answer.
-        // This creates a smoother user experience
-        this.$('.openTextInput-item-textbox').height(this.$('.openTextInput-item-modelanswer').height());
-        this.$('.openTextInput-count-characters').height(this.$('.openTextInput-count-characters').height());
       }
 
       this.$('.openTextInput-item-modelanswer').addClass('hide-openTextInput-modelanswer');
+
+      Adapt.on('notify:cancelled', function(e){
+        if (self.submissionClicked) {
+          if (self.$feedbackButton) {            
+            self.$feedbackButton.focus();
+          }
+          self.submissionClicked = false;
+        }
+      });
 
       QuestionView.prototype.postRender.call(this);
     },
