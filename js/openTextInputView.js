@@ -138,7 +138,7 @@ define([
   },
 
     canSubmit: function() {
-      var answer = this.model.get('_userAnswer');
+      var answer = this.countCharacters() > 0 ? this.model.get('_userAnswer') : '';
 
       return trimString(answer) !== '';
     },
@@ -210,16 +210,16 @@ define([
       } else {
         this.$('.openTextInput-count-amount').html(charLengthOfTextarea);
       }
+      return charLengthOfTextarea;
     },
 
     onKeyUpTextarea: _.throttle(function() {
       this.limitCharacters();
       var text = this.$textbox.val();
+      this.countCharacters();
 
       if (trimString(text) !== '') {
         this.model.set('_userAnswer', text);
-        this.countCharacters();
-
         if (this.saveTimeout) {
           clearTimeout(this.saveTimeout);
         }
